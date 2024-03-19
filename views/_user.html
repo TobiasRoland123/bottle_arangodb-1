@@ -1,22 +1,65 @@
 % import x
 
-<div id="{{user['_key']}}" class="user">
+<div
+  id="{{user['_key']}}"
+  class="user"
+>
+  <form id="user_{{user['_key']}}">
 
-    <form id="user_{{user['_key']}}">
 
-        <input name="user_name" value="{{user['name']}}" 
-        mix-check="{{x.USER_NAME_REGEX}}" mix-blur mix-put="/users/{{user['_key']}}" mix-data="#user_{{user['_key']}}"> 
-        
-        % last_name = user['last_name'] if 'last_name' in user else ''
-        <input name="user_last_name" value="{{last_name}}" 
-        mix-check="{{x.USER_LAST_NAME_REGEX}}" mix-blur mix-put="/users/{{user['_key']}}" mix-data="#user_{{user['_key']}}">         
-    </form>
-    
-    <button
-        mix-delete="/users/{{user['_key']}}"
-        mix-default="Delete"
-        mix-await="Deleting..."
-    >
-        Delete
-    </button>
+    <div class="user-initials">
+{{user['first_name'][0]}}{{user['last_name'][0]}}
+    </div>
+
+
+    <div id="{{user['_key']}}_gender">
+      {{x.return_gender(user['_key'], user['gender'])}}
+    </div >
+
+
+
+   
+
+    <input
+    name="user_username"
+    value="{{user['username']}}"
+    mix-check="{{x.USER_USERNAME_REGEX}}"
+    mix-blur
+    mix-put="/users/{{user['_key']}}"
+    mix-data="#user_{{user['_key']}}"
+  />
+    <input
+      name="user_first_name"
+      value="{{user['first_name']}}"
+      mix-check="{{x.USER_FIRST_NAME_REGEX}}"
+      mix-blur
+      mix-put="/users/{{user['_key']}}"
+      mix-data="#user_{{user['_key']}}"
+    />
+
+    % last_name = user['last_name'] if 'last_name' in user else ''
+    <input
+      name="user_last_name"
+      value="{{last_name}}"
+      mix-check="{{x.USER_LAST_NAME_REGEX}}"
+      mix-blur
+      mix-put="/users/{{user['_key']}}"
+      mix-data="#user_{{user['_key']}}"
+    />
+  </form>
+
+  <button
+    mix-delete="/users/{{user['_key']}}"
+    mix-default="Delete"
+    mix-await="Deleting..."
+  >
+    Delete
+  </button>
 </div>
+
+
+
+
+
+
+

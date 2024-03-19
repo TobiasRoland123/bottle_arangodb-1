@@ -45,10 +45,12 @@ def _():
 @post("/users")
 def _():
     try:
-        user_name = x.validate_user_name()
+        user_first_name = x.validate_user_first_name()
         user_last_name = x.validate_user_last_name()
-        ic(user_last_name)
-        user = {"name":user_name, "last_name":user_last_name}
+        user_username = x.validate_user_username()
+        user_gender = x.validate_user_gender()
+        ic(user_gender)
+        user = {"first_name":user_first_name, "last_name":user_last_name, "username": user_username, "gender": user_gender}
         res = x.db({"query":"INSERT @doc IN users RETURN NEW", "bindVars":{"doc":user}})
         html = template("_user.html", user=res["result"][0])
         form_create_user =  template("_form_create_user.html")
@@ -62,7 +64,7 @@ def _():
         """
     except Exception as ex:
         ic(ex)
-        if "user_name" in str(ex):
+        if "user_first_name" in str(ex):
             return f"""
             <template mix-target="#message">
                 {ex.args[1]}
@@ -77,14 +79,15 @@ def _():
 def _(key):
     try:
         ic(key)
+        validated_key = x.validate_user_key(key)
         res = x.db({"query":"""
                     FOR user IN users
                     FILTER user._key == @key
                     REMOVE user IN users RETURN OLD""", 
-                    "bindVars":{"key":key}})
+                    "bindVars":{"key":validated_key}})
         print(res)
         return f"""
-        <template mix-target="[id='{key}']" mix-replace>
+        <template mix-target="[id='{validated_key}']" mix-replace>
             <div class="mix-fade-out user_deleted" mix-ttl="2000">User deleted</div>
         </template>
         """
@@ -98,15 +101,17 @@ def _(key):
 @put("/users/<key>")
 def _(key):
     try:
-        name = x.validate_user_name()
+        first_name = x.validate_user_first_name()
         last_name = x.validate_user_last_name()
+        username= x.validate_user_username()
         res = x.db({"query":"""
-                        UPDATE { _key: @key, name: @name, last_name:@last_name } 
+                        UPDATE { _key: @key,username: @username, first_name: @first_name, last_name:@last_name } 
                         IN users 
                         RETURN NEW""",
                     "bindVars":{
                         "key": f"{key}",
-                        "name":f"{name}",
+                        "username":f"{username}",
+                        "first_name":f"{first_name}",
                         "last_name":f"{last_name}"
                     }})
         return f"""
@@ -115,7 +120,7 @@ def _(key):
         """
     except Exception as ex:
         ic(ex)
-        if "user_name" in str(ex):
+        if "user_first_name" in str(ex):
             return f"""
             <template mix-target="#message">
                 {ex.args[1]}
